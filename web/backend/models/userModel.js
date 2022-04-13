@@ -22,8 +22,9 @@ const user = {
             [req.body.email, hash, req.body.fname, req.body.lname, req.body.address, req.body.phone], callback);
         });
     },
-    update: function(req, callback){
-        
+    updateAvatar: function(userID, file, callback){
+        return db.query("UPDATE user SET picture = ? WHERE user_ID = ?",
+        [file, userID], callback);
     }
 
 }

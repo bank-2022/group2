@@ -31,6 +31,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors({origin: "*"}));
 //app.use(vue);
+app.use('/uploads', express.static('uploads'));
 
 app.use((err, req, res, next) => {
   console.error(err.stack)

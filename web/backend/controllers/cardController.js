@@ -104,7 +104,8 @@ const updateCardStatus = (req, res) => {
             }
 
             // activating card, resetting tries
-            if(req.body.active === 1){
+
+            if(req.body.active === "1"){
                 card.updateTries(0, req.body.card_number, (err, dbResult) =>{
 
                     if(err){
