@@ -21,6 +21,7 @@ public:
     IdleWindow(QWidget *parent = nullptr);
     ~IdleWindow();
 
+
 public slots:
     void PinSlot(QString);
     void Tries(int);
@@ -39,11 +40,10 @@ private:
     DLLSerialPort *serialPort;
     PinCodeDLL *pinCodeDLL;
     MainWindow *mainWindow = nullptr;
-    DLLRestAPI *dllRestApi;
     void HandleCard();
     char* rfid;
     QString pinCode;
     int tries;
-
+    DLLRestAPI *dllRestApi;
 };
 #endif // IDLEWINDOW_H

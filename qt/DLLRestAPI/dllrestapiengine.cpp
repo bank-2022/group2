@@ -31,8 +31,6 @@ void DLLRestAPIEngine::Login(QString card, QString pin)
 
 void DLLRestAPIEngine::loginSlot(QNetworkReply *reply)
 {
-
-
     QByteArray response_data=reply->readAll();
     QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
     QJsonObject json_obj = json_doc.object();
@@ -54,12 +52,14 @@ void DLLRestAPIEngine::loginSlot(QNetworkReply *reply)
         manager->deleteLater();
     }else if(status == "error"){
         qDebug() << this->resMessage;
-        this->GetTries(card_number);
+        tries--;
+        emit SendTriesSignal(tries);
+        //this->GetTries(card_number);
         //reply->deleteLater();
         //manager->deleteLater();
     }else{
         qDebug()<<"Wrong pin code"<<json_obj;
-        this->GetTries(card_number);
+        //this->GetTries(card_number);
         reply->deleteLater();
         manager->deleteLater();
     }
@@ -216,6 +216,8 @@ void DLLRestAPIEngine::getLogsSlot(QNetworkReply *reply)
 
     for(int i = 0; i < 10; i++)
         qDebug()<<"GET LOGS WITH ID: "<<idSignal[i];
+
+    emit logsFinishedSignal();
 
     reply->deleteLater();
     manager->deleteLater();

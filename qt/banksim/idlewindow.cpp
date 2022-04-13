@@ -9,9 +9,11 @@ IdleWindow::IdleWindow(QWidget *parent)
     rfid = NULL;
     tries = 3;
 
+    mainWindow = new MainWindow();
+    mainWindow->hide();
     serialPort = new DLLSerialPort(1);
     pinCodeDLL = new PinCodeDLL();
-    dllRestApi = new DLLRestAPI();
+    dllRestApi = mainWindow->api;
 
     connect(pinCodeDLL, SIGNAL(triesToDLL(int)), this, SLOT(Tries(int)));
     connect(pinCodeDLL, SIGNAL(pinToExe(QString)), this, SLOT(PinSlot(QString)));
@@ -53,14 +55,12 @@ void IdleWindow::PinSlot(QString pin){
 
 void IdleWindow::Tries(int triesAmount){
     tries = triesAmount;
-    qDebug() << "triesamount" << tries;
 }
 
 void IdleWindow::GetLoginStatus(QString status)
 {
     if(status == "success"){
         qDebug() << "Login successful";
-        mainWindow = new MainWindow();
 
         emit sendCloseSignal();
         this->hide();
@@ -69,8 +69,6 @@ void IdleWindow::GetLoginStatus(QString status)
     }
     else{
         qDebug() << "Login not successful";
-        tries--;
-        emit SendTries(tries);
     }
 }
 
@@ -86,8 +84,10 @@ void IdleWindow::HandleCard(){
 
 void IdleWindow::on_nappi_clicked()
 {
-    pinCodeDLL->ShowWindow();
     HandleCard();
+    if(!pinCodeDLL->isVisible()){
+        pinCodeDLL->ShowWindow();
+    }
 }
 
 void IdleWindow::GetTries(int x)

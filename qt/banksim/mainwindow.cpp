@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     this->setFixedSize(800,600);
+    api = new DLLRestAPI;
 
     ui->nostoArvo->setText(QString::number(nostoValue));
     QPushButton *numButtons[6];
@@ -19,11 +20,14 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(numButtons[i], SIGNAL(released()), this,
                 SLOT(on_amount_clicked()));
     }
+    connect(api, SIGNAL(logsUpdatedSignal()), this, SLOT(updateLogsView()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete api;
+    api = nullptr;
 }
 
 void MainWindow::on_amount_clicked(){
@@ -33,7 +37,7 @@ void MainWindow::on_amount_clicked(){
 }
 
 void MainWindow::on_nosto_clicked(){
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->stackedWidget->setCurrentIndex(3);
 }
 
 void MainWindow::on_takaisin_clicked(){
@@ -41,7 +45,7 @@ void MainWindow::on_takaisin_clicked(){
 }
 
 void MainWindow::on_talletus_clicked(){
-    ui->stackedWidget->setCurrentIndex(2);
+    ui->stackedWidget->setCurrentIndex(4);
 }
 
 void MainWindow::on_takaisin_talletus_clicked(){
@@ -54,3 +58,34 @@ void MainWindow::on_clear_clicked()
     nostoValue = 0.0;
     ui->nostoArvo->setText(QString::number(nostoValue));
 }
+
+void MainWindow::on_saldo_nappi_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+
+void MainWindow::on_close_button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void MainWindow::on_close_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void MainWindow::on_tilitapahtumat_clicked()
+{
+    api->UpdateLogs(1);
+    ui->stackedWidget->setCurrentIndex(1);
+}
+
+//---------------------TILITAPAHTUMAT PAGE-----------------------
+void MainWindow::updateLogsView()
+{
+    //ui->listView
+}
+

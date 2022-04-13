@@ -7,6 +7,7 @@ DLLRestAPI::DLLRestAPI(QObject *parent) : QObject(parent)
             this,SLOT(GetTriesSlot(int)));
 
     connect(engine, SIGNAL(AuthStatus(QString)), this, SLOT(LoginStatusSlot(QString)));
+    connect(engine, SIGNAL(logsFinishedSignal), this, SLOT(GetLogs10));
 }
 
 DLLRestAPI::~DLLRestAPI()
