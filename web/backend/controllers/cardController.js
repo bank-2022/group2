@@ -82,6 +82,40 @@ const getCardAccountInfo = (req, res) => {
     });
 }
 
+const getCardAccountInfoByNumber = (req, res) => {
+    if(req.params.card_number){
+        card.getByUserID(req.userId, (err, dbResult) =>{
+
+            if(err){
+                return res.json({status:"error",message:err});
+            }
+
+            let hasAccessToCard = false;
+        
+            for(let i = 0; i < dbResult.length; i++){
+                if(dbResult[i].card_number === req.params.card_number){
+                    hasAccessToCard = true;
+                }
+            }
+
+            if(!hasAccessToCard){
+                return res.json({status:"error",message:"User doesn't have this card"});
+            }
+
+            card.getCardAccountInfoByNumber(req.params.card_number, function(err, dbResult){
+                if(err){
+                    return res.json({status:"error",message:err});
+                }
+                if(dbResult.length > 0){
+                    return res.json(dbResult[0]);
+                }else{
+                    return res.json({status:"error",message:"No cards found for this user"});
+                }
+            });
+        });
+    }
+}
+
 const updateCardStatus = (req, res) => {
     if(req.body.active && req.body.card_number){
         // check if user has access to queried card
@@ -412,6 +446,7 @@ module.exports = {
     getByCardNumber,
     getByUserID,
     getCardAccountInfo,
+    getCardAccountInfoByNumber,
     getTries,
     updateCardStatus,
     addCard,

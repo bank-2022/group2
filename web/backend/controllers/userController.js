@@ -145,6 +145,11 @@ const updateAvatar = (req, res) => {
 
     upload(req,res, (err) => {
 
+        // check if file is not found 
+        if(!req.file){
+            return res.json({status:"error", message:"File not found"});
+        }
+        
         // return out if multer error
         if(err){
             return res.json({status:"error", message:err});

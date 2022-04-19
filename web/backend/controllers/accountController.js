@@ -95,6 +95,72 @@ const addUserToAccount = (req, res) => {
     }
 }
 
+const updateBalance = (req, res) => {
+    if(req.body.card_number && req.body.amount && req.body.action){
+        card.getByUserID(req.userId, (err, dbResult) =>{
+
+            if(err){
+                return res.json({status:"error",message:err});
+            }
+
+            let hasAccessToCard = false;
+        
+            for(let i = 0; i < dbResult.length; i++){
+                if(dbResult[i].card_number === req.body.card_number){
+                    hasAccessToCard = true;
+                }
+            }
+
+            if(!hasAccessToCard){
+                return res.json({status:"error",message:"User doesn't have this card"});
+            }
+
+            account.getByCardNumber(req.body.card_number, function(err, dbResult){
+                if(err){
+                    return res.json({status:"error",message:err});
+                }
+                if(dbResult.length > 0){
+                    let curbalance = dbResult[0].balance;
+                    if(req.body.action === "0" && dbResult[0].card_type === 0){
+                        if(dbResult[0].balance >= req.body.amount){
+                            account.updateBalance(-Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
+                                curbalance += -Math.abs(req.body.amount);
+                                return res.json({status:"success",balance:curbalance});
+                            });
+                        }else{
+                            return res.json({status:"error",message:"Not enough balance."});
+                        }
+                    }else if(req.body.action === "0" && dbResult[0].card_type === 1){
+                        account.updateBalance(-Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
+                            if(err){
+                                return res.json({status:"error",message:err});
+                            }
+                            if(dbResult.affectedRows > 0){
+                                curbalance += -Math.abs(req.body.amount);
+                                return res.json({status:"success",balance:curbalance});
+                            }
+                        });
+                    }else if(req.body.action === "1"){
+                        account.updateBalance(Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
+                            if(err){
+                                return res.json({status:"error",message:err});
+                            }
+                            if(dbResult.affectedRows > 0){
+                                curbalance += Math.abs(req.body.amount);
+                                return res.json({status:"success",balance:curbalance});
+                            }
+                        });
+                    }else{
+                        return res.json({status:"error",message:"Invalid value for 'action'."});
+                    }
+                }
+            });
+        });
+    }else{
+        return res.json({status:"error",message:"Please fill all fields."});
+    }
+}
+
 const deleteAccount = (req, res) => {
     if(req.body.id){
         account.getOwnerById(req.userId, req.body.id, function(err, dbResult){
@@ -140,5 +206,6 @@ module.exports = {
     getOwnedAccounts,
     addAccount,
     addUserToAccount,
+    updateBalance,
     deleteAccount,
 }

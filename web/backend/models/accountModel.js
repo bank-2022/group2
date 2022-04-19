@@ -13,6 +13,10 @@ const account = {
         [req.userId], callback);
 
     },
+    getByCardNumber: function(card_number, callback){
+        return db.query("SELECT account.*, card.card_type FROM account JOIN card ON card.account_ID = account.account_ID WHERE card_number = ?",
+        [card_number], callback);
+    },
     getExact: function(userId, accountId, callback){
         return db.query("SELECT * FROM user_account WHERE user_ID = ? AND account_ID = ?",
         [userId, accountId], callback);
@@ -33,6 +37,10 @@ const account = {
     },
     addUser: function(userId, accountId, callback){
         return db.query("INSERT INTO user_account(user_ID, account_ID) VALUES(?, ?)", [userId, accountId], callback);
+    },
+    updateBalance: function(amount, card_number, callback){
+        return db.query("UPDATE account JOIN card ON card.account_ID = account.account_ID SET balance = balance + ? WHERE card.card_number = ?",
+        [amount, card_number], callback);
     },
     delete: function(accountId, callback){
         return db.query("DELETE FROM account WHERE account_ID = ?", [accountId], callback);

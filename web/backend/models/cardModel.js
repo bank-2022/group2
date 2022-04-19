@@ -16,6 +16,10 @@ const card = {
         return db.query("SELECT card.card_number, card.card_type, account.account_ID, account.name, account.balance FROM card JOIN account ON account.account_ID = card.account_ID WHERE card.user_ID = ?",
         [userId], callback);
     },
+    getCardAccountInfoByNumber: function(card_number, callback){
+        return db.query("SELECT card.card_number, card.card_type, account.account_ID, account.name, account.balance FROM card JOIN account on account.account_ID = card.account_ID WHERE card_number = ?",
+        [card_number], callback);
+    },
     getTries: function(card_number, callback){
         return db.query("SELECT tries FROM card WHERE card_number = ?", [card_number], callback);
     },

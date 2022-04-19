@@ -7,6 +7,8 @@ const card = require('../models/cardModel');
 
 router.get('/getAllCards', jwtAuth.verifyToken, cardController.getAll)
 
+router.get("/info/:card_number", jwtAuth.verifyToken, cardController.getCardAccountInfoByNumber);
+
 router.get("/info", jwtAuth.verifyToken, cardController.getCardAccountInfo);
 
 router.get("/tries/:card_number", cardController.getTries);
