@@ -18,9 +18,13 @@ public:
 private slots:
 
     void on_nosto_clicked();
+
     void on_takaisin_clicked();
+
     void on_talletus_clicked();
+
     void on_takaisin_talletus_clicked();
+
     void on_amount_clicked();
 
     void on_clear_clicked();

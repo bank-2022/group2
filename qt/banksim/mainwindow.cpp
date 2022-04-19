@@ -29,13 +29,18 @@ MainWindow::~MainWindow()
     delete api;
     api = nullptr;
 }
-
+//---------------- NOSTO PAGE-----------------
 void MainWindow::on_amount_clicked(){
     QPushButton *button = (QPushButton *)sender();
     nostoValue=button->text().toDouble();
     ui->nostoArvo->setText(QString::number(nostoValue));
 }
-
+void MainWindow::on_clear_clicked()
+{
+    nostoValue = 0.0;
+    ui->nostoArvo->setText(QString::number(nostoValue));
+}
+//
 void MainWindow::on_nosto_clicked(){
     ui->stackedWidget->setCurrentIndex(3);
 }
@@ -50,13 +55,6 @@ void MainWindow::on_talletus_clicked(){
 
 void MainWindow::on_takaisin_talletus_clicked(){
     ui->stackedWidget->setCurrentIndex(0);
-}
-
-
-void MainWindow::on_clear_clicked()
-{
-    nostoValue = 0.0;
-    ui->nostoArvo->setText(QString::number(nostoValue));
 }
 
 void MainWindow::on_saldo_nappi_clicked()
