@@ -16,8 +16,9 @@
               <v-icon>{{ item.type }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title>{{ item.title }} | Account ID: {{ item.accountId }} | {{ item.balance }}€</v-list-item-title>
+              <v-list-item-title>{{ item.title }} | Account ID: {{ item.accountId }} | {{ item.balance }}€   | <v-icon small  @click="deleteAccount(item)">mdi-delete</v-icon></v-list-item-title>
             </v-list-item-content>
+
           </v-list-item>
           <v-divider dark inset></v-divider>
         </v-list>

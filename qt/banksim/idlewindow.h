@@ -23,17 +23,18 @@ public:
 
 
 public slots:
-    void PinSlot(QString);
-    void Tries(int);
-    void GetLoginStatus(QString);
 
 signals:
     void SendTries(int);
     void sendCloseSignal();
     void sendAuthInfo(QString, QString);
 private slots:
+    void PinSlot(QString);
+    void Tries(int);
+    void GetLoginStatus(QString);
     void on_nappi_clicked();
     void GetTries(int);
+    void LogOutSlot();
 
 private:
     Ui::IdleWindow *ui;
@@ -41,7 +42,7 @@ private:
     PinCodeDLL *pinCodeDLL;
     MainWindow *mainWindow = nullptr;
     void HandleCard();
-    char* rfid;
+    QString rfid;
     QString pinCode;
     int tries;
     DLLRestAPI *dllRestApi;

@@ -1,7 +1,6 @@
 #include "dllserialport.h"
-
+QString rfid1;
 void ReadCard(char* data);
-char* rfid;
 
 DLLSerialPort::DLLSerialPort(int comPort)
 {
@@ -16,15 +15,15 @@ DLLSerialPort::~DLLSerialPort()
     engineClass = nullptr;
 }
 
-char* DLLSerialPort::GetRFID()
+QString DLLSerialPort::GetRFID()
 {
     engineClass->ReadCard(18, ReadCard);
-    return rfid;
+    engineClass->ClosePort();
+    return rfid1;
 }
 
 void ReadCard(char* data)
 {
-    cout << "rfid: " << data << endl;
-    rfid = data;
-
+    cout << "rfid: in read card " << data << endl;
+    rfid1 = data;
 }

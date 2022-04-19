@@ -6,12 +6,11 @@ IdleWindow::IdleWindow(QWidget *parent)
     , ui(new Ui::IdleWindow){
     ui->setupUi(this);
     this->setFixedSize(800,600);
-    rfid = NULL;
+    rfid = "";
     tries = 3;
-
+    this->show();
     mainWindow = new MainWindow();
     mainWindow->hide();
-    serialPort = new DLLSerialPort(1);
     pinCodeDLL = new PinCodeDLL();
     dllRestApi = mainWindow->api;
 
@@ -21,9 +20,9 @@ IdleWindow::IdleWindow(QWidget *parent)
     connect(this, SIGNAL(SendTries(int)), pinCodeDLL, SLOT(getTriesFromEXE(int)));
     connect(this, SIGNAL(sendCloseSignal()), pinCodeDLL, SLOT(closeSignalSlot()));
     connect(dllRestApi, SIGNAL(StatusToExe(QString)), this, SLOT(GetLoginStatus(QString)));
-
+    connect(mainWindow, SIGNAL(logOutSignal()), this, SLOT(LogOutSlot()));
     connect(this, SIGNAL(sendAuthInfo(QString,QString)), dllRestApi, SLOT(LoginSlot(QString,QString)));
-    HandleCard();
+    //HandleCard();
 }
 IdleWindow::~IdleWindow(){
     disconnect(pinCodeDLL, SIGNAL(triesToDLL(int)), this, SLOT(Tries(int)));
@@ -36,10 +35,8 @@ IdleWindow::~IdleWindow(){
     delete ui;
     delete pinCodeDLL;
     delete serialPort;
-    delete dllRestApi;
     pinCodeDLL = nullptr;
     serialPort = nullptr;
-    dllRestApi = nullptr;
     if(mainWindow != nullptr){
         delete mainWindow;
         mainWindow = nullptr;
@@ -64,7 +61,7 @@ void IdleWindow::GetLoginStatus(QString status)
 
         emit sendCloseSignal();
         this->hide();
-
+        rfid = "";
         mainWindow->show();
     }
     else{
@@ -73,9 +70,18 @@ void IdleWindow::GetLoginStatus(QString status)
 }
 
 void IdleWindow::HandleCard(){
+<<<<<<< HEAD
     //rfid = serialPort->GetRFID(); insert real card here
     rfid = (char*) "254654657328";
     if( rfid != NULL){
+=======
+      serialPort = new DLLSerialPort(4);
+//    rfid = serialPort->GetRFID(); //insert real card here
+//    qDebug()<<rfid<<" debuggg";
+    rfid = "747399673461";
+  
+    if( rfid != ""){
+>>>>>>> 173bd9ae183edadaa02b6e4e9ca08a3caa5eea90
         delete serialPort;
         serialPort = nullptr;
         dllRestApi->GetTriesFromApi(rfid);
@@ -85,13 +91,19 @@ void IdleWindow::HandleCard(){
 void IdleWindow::on_nappi_clicked()
 {
     HandleCard();
-    if(!pinCodeDLL->isVisible()){
-        pinCodeDLL->ShowWindow();
-    }
 }
 
 void IdleWindow::GetTries(int x)
 {
     emit SendTries(x);
     qDebug() << "Sent tries to pincodeui";
+    if(!pinCodeDLL->isVisible()){
+        pinCodeDLL->ShowWindow();
+    }
+}
+
+void IdleWindow::LogOutSlot()
+{
+    this->show();
+    dllRestApi = mainWindow->api;
 }

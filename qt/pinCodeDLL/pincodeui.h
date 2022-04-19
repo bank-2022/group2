@@ -30,7 +30,6 @@ private:
 
     void resetTimer();
 
-    void resetText();
     int currentTries = 1;
 
     QTimer * timer;
@@ -43,7 +42,8 @@ private slots:
     void on_btn_ok_clicked();
 
     void autoTimeout();
-    void on_pushButton_clicked();
+
+    void on_btn_cancel_clicked();
 
 public slots:
     void getTries(int);

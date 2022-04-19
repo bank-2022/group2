@@ -2,34 +2,115 @@
 <template>
   <div class="dashboard">
     <app-sidebar />
+    <br />
+    <v-alert dense text type="success"> Welcome back {{ fname }}! </v-alert>
     <v-row>
-      <v-col lg="7" cols="12">
-        <v-alert dense text type="success"> Welcome back {{ fname }}! </v-alert>
-        <v-row>
-          <v-col
-            lg="6"
-            cols="12"
-            v-for="(item, index) in activityLog"
-            :key="index">
-            <v-card elevation="2" class="rounded-lg">
-              <v-card-text class="d-flex justify-space-between align-center">
-                <div>
-                  <strong>{{ item.title }}</strong> <br />
-                  <span>Last 3 weeks</span>
-                </div>
-                <v-avatar
-                  size="60"
-                  :color="item.color"
-                  style="border: 3px solid #444"
-                >
-                  <span style="color: white">{{ item.amount }} +</span>
-                </v-avatar>
-              </v-card-text>
-              <v-card-actions class="d-flex justify-space-between">
-              </v-card-actions>
-            </v-card>
+      <v-col>
+        <v-card class="blue-grey darken-3">
+          <v-card-title class="cyan darken-1">
+            <span
+              class="font-weight-bold text-h5 blue-grey--text text--darken-3"
+              >Edit profile</span
+            >
+          </v-card-title>
+          <v-col <v-col cols="12" sm="12" >
+          <v-form @submit.prevent="submitRegister" id="register-form">
+            <v-row>
+              <v-col cols="12" sm="5" md="5">
+                <v-text-field
+                  dark
+                  id="firstname"
+                  :label='fname'
+                  name="firstname"
+                  placeholder="New Name"
+                  prepend-icon="person"
+                  type="Firstname"
+                  color="cyan darken-1"
+                  autocomplete="off"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="7" md="7">
+                <v-text-field
+                  dark
+                  id="lastname"
+                  :label='lname'
+                  name="lastname"
+                  placeholder="New Lastname"
+                  type="Lastname"
+                  color="cyan darken-1"
+                  autocomplete="off"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-text-field
+              dark
+              id="email"
+              :rules="emailRules"
+              :label='email'
+              name="email"
+              placeholder="New Email"
+              prepend-icon="email"
+              type="text"
+              color="cyan darken-1"
+              autocomplete="off"
+              required
+            />
+            <v-text-field
+              dark
+              :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show1 ? 'text' : 'password'"
+              id="password"
+              label="Password"
+              name="password"
+              placeholder="New password"
+              v-model="password"
+              prepend-icon="lock"
+              color="cyan darken-1"
+              @click:append="show1 = !show1"
+              required
+            />
+            <v-text-field
+              dark
+              id="phone"
+              :label='phone'
+              name="phone"
+              placeholder="New Phone"
+              prepend-icon="phone"
+              type="Phone"
+              color="cyan darken-1"
+            />
+            <v-text-field
+              dark
+              id="address"
+              :label='address'
+              name="address"
+              placeholder="New Addres"
+              prepend-icon="mdi-map-marker"
+              type="Address"
+              color="cyan darken-1"
+            />
+            <v-file-input
+              dark
+              color="cyan darken-1"
+              accept="image/*"
+              label="Add new profile picture"
+            ></v-file-input>
+            <br />
+            <h5>{{ registerResponse }}</h5>
+            <div class="text-center mt-n5">
+              <v-btn
+                type="submit"
+                rounded
+                color="cyan darken-1"
+                dark
+                form="register-form"
+                >SAVE</v-btn
+              >
+            </div>
+          </v-form>
           </v-col>
-        </v-row>
+          <br />
+        </v-card>
       </v-col>
     </v-row>
   </div>
@@ -38,40 +119,23 @@
 <script>
 import axios from "../axios";
 export default {
-  name: "Dashboard",
-  props: ["resource", "title"],
   data() {
     return {
       fname: "",
-      activityLog: [
-        {
-          title: "Total Products",
-          amount: 50,
-          icon: "mdi-account",
-          color: "cyan lighten-3",
-        },
-        {
-          title: "Total Customer",
-          amount: 3433,
-          icon: "mdi-account-group-outline",
-          color: "green darken-2",
-        },
-        {
-          title: "Total Sale",
-          amount: 3433,
-          icon: "mdi-account-group-outline",
-          color: "blue-grey darken-1",
-        },
-      ],
+      show1: false,
     };
   },
-  methods: {
+    methods: {
     async getUserData() {
       const response = await axios.get("/api/user/info");
       this.fname = response.data.fname;
+      this.lname = response.data.lname;
+      this.email = response.data.email;
+      this.phone = response.data.phone;
+      this.address = response.data.address;
     },
   },
-  mounted() {
+    mounted() {
     this.getUserData();
   },
 };

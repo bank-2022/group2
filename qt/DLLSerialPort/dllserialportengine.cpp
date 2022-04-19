@@ -53,7 +53,7 @@ void DLLSerialPortEngine::ReadCard(size_t bufferSize, void (*OnRead)(char *))
     DWORD dwBytesRead;
 
     reading = true;
-    while(reading){
+    do{
         if(HasOverlappedIoCompleted(&ovRead)){
             if(!ReadFile(hSerial, serialBuffer, bufferSize, &dwBytesRead, &ovRead)){
                 DWORD dwError = GetLastError();
@@ -75,13 +75,16 @@ void DLLSerialPortEngine::ReadCard(size_t bufferSize, void (*OnRead)(char *))
             serialBuffer[15] = '0';
             serialBuffer[14] = '0';
             serialBuffer[13] = '0';
-            OnRead(serialBuffer);
-            memset(serialBuffer, 0, bufferSize);
-        }
-    }
 
+            CloseHandle(hReadEvent);
+            reading = false;
+        }
+    }while(reading);
+
+    OnRead(serialBuffer);
+    memset(serialBuffer, 0, bufferSize);
     free(serialBuffer);
-    CloseHandle(hReadEvent);
+    ClosePort();
 }
 
 HANDLE DLLSerialPortEngine::GetSerialPortHandle(int comPort)

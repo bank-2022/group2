@@ -2,6 +2,8 @@
 <template>
   <div class="dashboard">
     <app-sidebar />
+    <app-cardtable/>
+    <br>
     <app-cards />
     <v-row>
       <v-col cols="12" sm="8">

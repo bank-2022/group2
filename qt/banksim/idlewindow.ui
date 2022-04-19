@@ -29,7 +29,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Syötä kortti</string>
+     <string>Insert card</string>
     </property>
    </widget>
    <widget class="QPushButton" name="nappi">
@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>nappi</string>
+     <string>Button</string>
     </property>
    </widget>
   </widget>

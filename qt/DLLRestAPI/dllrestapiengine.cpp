@@ -9,7 +9,8 @@ DLLRestAPIEngine::DLLRestAPIEngine(QObject * parent) : QObject(parent)
 
 DLLRestAPIEngine::~DLLRestAPIEngine()
 {
-
+    reply->deleteLater();
+    manager->deleteLater();
 }
 //-----------------START OF INFO GATHERING--------------------------------------------------------
 void DLLRestAPIEngine::Login(QString card, QString pin)
@@ -43,9 +44,7 @@ void DLLRestAPIEngine::loginSlot(QNetworkReply *reply)
         auth = "Bearer "+auth;
         authByteArr = auth.toUtf8();
         qDebug()<<"LOG IN "<<status<<Qt::endl;
-        //reply->deleteLater();
-        //manager->deleteLater();
-        //GetUserInfo();
+        GetUserInfo();
     }else if(status==NULL){
         qDebug()<<"express offline";
         reply->deleteLater();
@@ -54,14 +53,8 @@ void DLLRestAPIEngine::loginSlot(QNetworkReply *reply)
         qDebug() << this->resMessage;
         tries--;
         emit SendTriesSignal(tries);
-        //this->GetTries(card_number);
-        //reply->deleteLater();
-        //manager->deleteLater();
     }else{
         qDebug()<<"Wrong pin code"<<json_obj;
-        //this->GetTries(card_number);
-        reply->deleteLater();
-        manager->deleteLater();
     }
 
     disconnect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(loginSlot(QNetworkReply*)));
@@ -90,13 +83,31 @@ void DLLRestAPIEngine::getUserInfoSlot(QNetworkReply *reply)
     address = json_obj["address"].toString();
     email = json_obj["email"].toString();
     phone = json_obj["phone"].toString();
+    profilePic = json_obj["picture"].toString();
 
-    qDebug()<<"GET USERINFO "<<fname<<lname<<address<<email<<phone<<Qt::endl;
-    reply->deleteLater();
-    manager->deleteLater();
-    GetCardInfo();
+    qDebug()<<"GET USERINFO "<<fname<<lname<<address<<email<<phone<<profilePic<<Qt::endl;
+
+    GetPictureData(profilePic);
 }
 
+
+void DLLRestAPIEngine::GetPictureData(QString path)
+{
+
+    QNetworkRequest request(base_url+"uploads/"+path);
+    manager = new QNetworkAccessManager(this);
+    request.setRawHeader("Authorization", authByteArr);
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getPictureDataSlot(QNetworkReply*)));
+
+    reply = manager->get(request);
+}
+
+void DLLRestAPIEngine::getPictureDataSlot(QNetworkReply *reply)
+{
+    pictureData = reply->readAll();
+
+    GetCardInfo();
+}
 
 void DLLRestAPIEngine::GetCardInfo()
 {
@@ -128,8 +139,6 @@ void DLLRestAPIEngine::getCardInfoSlot(QNetworkReply *reply)
 
     qDebug()<<"GET CARD INFO (account id) "<<account_id_int<<Qt::endl;
 
-    reply->deleteLater();
-    manager->deleteLater();
     GetAccountInfo();
 }
 
@@ -146,6 +155,7 @@ void DLLRestAPIEngine::GetAccountInfo()
     reply = manager->get(request);
 }
 
+
 void DLLRestAPIEngine::getAccountInfoSlot(QNetworkReply *reply)
 {
     QByteArray response_data = reply->readAll();
@@ -159,17 +169,19 @@ void DLLRestAPIEngine::getAccountInfoSlot(QNetworkReply *reply)
     }
 
     qDebug()<<"GET ACCOUNT INFO"<<account_balance<<account_name<<Qt::endl;
-    reply->deleteLater();
-    manager->deleteLater();
-    GetLogs();
+
+    emit dataGatheringFinished();
 }
 
 void DLLRestAPIEngine::GetLogs()
 {
-    if(logs_curret_page <= 0)
+    if(logs_curret_page <= 0){
         logs_curret_page = 1;
-    if(logs_curret_page > logs_total_pages)
+        return;
+    }else if(logs_curret_page > logs_total_pages){
         logs_curret_page = logs_total_pages;
+        return;
+    }
 
     QString requestUrl = "api/logs/getByCardNumber/"+card_number + "/" + QString::number(logs_curret_page);
     QNetworkRequest request(base_url+ requestUrl);
@@ -178,6 +190,7 @@ void DLLRestAPIEngine::GetLogs()
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getLogsSlot(QNetworkReply*)));
 
     reply = manager->get(request);
+
 }
 
 void DLLRestAPIEngine::getLogsSlot(QNetworkReply *reply)
@@ -187,6 +200,7 @@ void DLLRestAPIEngine::getLogsSlot(QNetworkReply *reply)
     QJsonObject object = json_doc.object();
     QJsonValue value = object.value("data");
     QJsonArray array = value.toArray();
+
     logs_total_pages = object["maxPageAmount"].toInt();
     logs_amount_list.clear();
     logs_id_list.clear();
@@ -218,12 +232,9 @@ void DLLRestAPIEngine::getLogsSlot(QNetworkReply *reply)
         qDebug()<<"GET LOGS WITH ID: "<<idSignal[i];
 
     emit logsFinishedSignal();
-
-    reply->deleteLater();
-    manager->deleteLater();
 }
 //-----------------END OF INFO GATHERING--------------------------------------------------------
-void DLLRestAPIEngine::CreateLog(int amount)
+void DLLRestAPIEngine::CreateLog(double amount)
 {
     QJsonObject jsonObj;
     jsonObj.insert("amount",amount);
@@ -251,8 +262,7 @@ void DLLRestAPIEngine::createLogSlot(QNetworkReply *reply)
     }else{
         qDebug()<<"error adding log";
     }
-    reply->deleteLater();
-    manager->deleteLater();
+    GetLogs();
 }
 
 void DLLRestAPIEngine::GetTries(QString card_number){
@@ -276,9 +286,6 @@ void DLLRestAPIEngine::getTriesSlot(QNetworkReply *reply){
     tries = json_obj["tries"].toInt();
     tries = 3 - tries;
 
-    //reply->deleteLater();
-    //manager->deleteLater();
-
     disconnect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getTriesSlot(QNetworkReply*)));
 
     emit SendTriesSignal(tries);
@@ -286,29 +293,48 @@ void DLLRestAPIEngine::getTriesSlot(QNetworkReply *reply){
     qDebug() << "Got tries from api" << tries;
 }
 
-void DLLRestAPIEngine::GetBalance()
+
+void DLLRestAPIEngine::updateBalance(int action, double amount)
 {
-    QString requestStr = QStringLiteral("api/account/%1").arg(account_id_int);
+    QString requestStr = QStringLiteral("api/account/update");
+    QJsonObject jsonObj;
+    jsonObj.insert("card_number",card_number);
+    jsonObj.insert("amount",amount);
+    jsonObj.insert("action",QString::number(action));
+    lastAction = action;
+    lastTransaction = amount;
     QNetworkRequest request(base_url+requestStr);
+    qDebug()<<jsonObj;
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
     request.setRawHeader("Authorization", authByteArr);
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateBalanceSlot(QNetworkReply*)));
 
-    reply = manager->get(request);
+    reply = manager->put(request, QJsonDocument(jsonObj).toJson());
 }
 
 void DLLRestAPIEngine::updateBalanceSlot(QNetworkReply *reply)
 {
     QByteArray response_data = reply->readAll();
     QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
-    QJsonArray json_array = json_doc.array();
+    QJsonObject obj = json_doc.object();
+    QString resp;
 
-    foreach(const QJsonValue &value, json_array){
-        QJsonObject obj = value.toObject();
-        account_balance = obj["balance"].toDouble();
-    }
-
+    account_balance = obj["balance"].toDouble();
+    resp = obj["message"].toString();
+    if(resp == ""){
     qDebug()<<"CURRENT BALANCE "<<account_balance<<Qt::endl;
-    reply->deleteLater();
-    manager->deleteLater();
+    qDebug()<<"BALANCE UPDATE RESPONSE "<<resp<<Qt::endl;
+    int tempAction = 0;
+        if(lastAction == 0)
+            tempAction = -1;
+        if(lastAction == 1)
+            tempAction = 1;
+
+    emit balanceUpdated(account_balance);
+    CreateLog(lastTransaction*tempAction);
+    }else{
+        qDebug()<<"Error updating balance";
+        qDebug()<<resp;
+    }
 }

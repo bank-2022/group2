@@ -19,7 +19,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>PIN-koodi näkymä</string>
+   <string>PIN code window</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -52,7 +52,7 @@
           <bool>true</bool>
          </property>
          <property name="placeholderText">
-          <string>Anna PIN-koodi</string>
+          <string>Enter PIN code</string>
          </property>
         </widget>
        </item>
@@ -234,6 +234,9 @@
        </item>
        <item row="3" column="3">
         <widget class="QPushButton" name="btn_ok">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="font">
           <font>
            <pointsize>14</pointsize>
@@ -265,7 +268,7 @@
         </widget>
        </item>
        <item row="1" column="3">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="btn_cancel">
          <property name="font">
           <font>
            <pointsize>14</pointsize>

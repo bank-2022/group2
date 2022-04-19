@@ -57,6 +57,7 @@ void PinCodeUI::clearPin()
     censoredPinCode = "";
 
     setPinCodeText(censoredPinCode);
+    ui->btn_ok->setEnabled(false);
 }
 
 void PinCodeUI::setInfoText(QString txt)
@@ -70,13 +71,6 @@ void PinCodeUI::resetTimer()
     timer->start(10000);
 }
 
-void PinCodeUI::resetText()
-{
-    // reset pincode var and text
-    pinCode = "";
-    setPinCodeText(pinCode);
-}
-
 void PinCodeUI::handleClick()
 {
 
@@ -85,6 +79,7 @@ void PinCodeUI::handleClick()
     QString btnName = sender->objectName();
 
     // check if pinCode length is 4 or more then return out
+
     if (pinCode.length() >= 4){
         return;
     }
@@ -108,6 +103,10 @@ void PinCodeUI::handleClick()
             // update text box
             setPinCodeText(censoredPinCode);
         }
+    }
+
+    if (pinCode.length() >= 4 && currentTries > 0){
+        ui->btn_ok->setEnabled(true);
     }
 
     resetTimer();
@@ -139,7 +138,8 @@ void PinCodeUI::on_btn_ok_clicked()
 
     emit sendPinCode(pinCode);
 
-    resetText();
+    clearPin();
+    ui->btn_ok->setEnabled(false);
 }
 
 void PinCodeUI::autoTimeout()
@@ -147,7 +147,7 @@ void PinCodeUI::autoTimeout()
     if(this->isVisible()){
         qDebug() << "Auto timeout because no action was taken in 10 s";
 
-        resetText();
+        clearPin();
 
         this->close();
     }
@@ -162,17 +162,17 @@ void PinCodeUI::getTries(int tries)
     currentTries = tries;
 
     if (currentTries <= 0){
-        ui->infoTextBox->setText("Ei yrityksiä jäljellä");
+        ui->infoTextBox->setText("No attempts left");
+        ui->btn_ok->setEnabled(false);
 
     }else{
-        ui->infoTextBox->setText(QString::number(currentTries) + " yritystä jäljellä");
+        ui->infoTextBox->setText(QString::number(currentTries) + " attempts left");
     }
 }
 
-
-void PinCodeUI::on_pushButton_clicked()
+void PinCodeUI::on_btn_cancel_clicked()
 {
-    resetText();
+    clearPin();
 
     this->close();
 }
