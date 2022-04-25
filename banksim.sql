@@ -88,7 +88,7 @@ DROP TABLE IF EXISTS `logs`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `logs` (
   `log_ID` int NOT NULL AUTO_INCREMENT,
-  `date` datetime NOT NULL,
+  `date` varchar(45) NOT NULL,
   `event` varchar(45) NOT NULL,
   `amount` double(9,2) NOT NULL,
   `account_ID` int NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE `user` (
   `email` varchar(100) NOT NULL,
   `phone` varchar(45) NOT NULL,
   `password` binary(60) NOT NULL,
-  `picture` VARCHAR(45) NOT NULL DEFAULT 'default.png',
+  `picture` varchar(45) NOT NULL DEFAULT 'default.png',
   PRIMARY KEY (`user_ID`),
   UNIQUE KEY `user_ID_UNIQUE` (`user_ID`) /*!80000 INVISIBLE */,
   UNIQUE KEY `email_UNIQUE` (`email`)
@@ -175,4 +175,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-11 18:10:36
+-- Dump completed on 2022-04-25 11:09:44
