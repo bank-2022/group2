@@ -55,7 +55,7 @@ const userLogin = (req, res) => {
                     console.log("No user found with this email");
                     res.json({status:"error",message:"No user found with this email."});
                 }
-            };
+            }
         });
     }else{
         res.json({status:"error",message:"Please enter email and password."});

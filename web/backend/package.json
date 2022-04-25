@@ -25,5 +25,9 @@
     "pug": "^3.0.2",
     "read-chunk": "^4.0.2",
     "sanitizer": "^0.1.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-plugin-vue": "^8.6.0"
   }
 }

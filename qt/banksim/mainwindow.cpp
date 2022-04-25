@@ -88,6 +88,8 @@ void MainWindow::on_clear_clicked()
 }
 //
 void MainWindow::on_nosto_clicked(){
+    ui->saldoArvo->setText(this->balance);
+
     ui->stackedWidget->setCurrentIndex(3);
 }
 
